@@ -1,0 +1,16 @@
+flutter_native_splash:
+  color: "#F2FEFF"  # اللون العام للخلفية
+  color_dark: "#101127"  # اللون العام للخلفية في وضع الليلي
+  image: assets/images/Logo.png
+  image_dark: assets/images/Logo.png
+
+  android_12:
+    color: "#F2FEFF"
+    color_dark: "#101127"
+    image: assets/images/android12_splashScreen(light).png
+    image_dark: assets/images/android12_splashScreen(dark).png
+    branding: assets/images/branding_image.png
+    branding_dark: assets/images/branding_image.png
+    branding_bottom_padding: 32
+
+  web: false
