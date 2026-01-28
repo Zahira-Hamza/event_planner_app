@@ -6,8 +6,9 @@ import '../../core/utils/app_assets.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_routes.dart';
 import '../../core/utils/app_styles.dart';
+import '../../core/utils/validators.dart';
 import '../../core/widgets/custom_elavated button.dart';
-import '../../core/widgets/custom_text_field.dart';
+import '../../core/widgets/custom_text_form_field.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -56,11 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               children: [
                 SizedBox(height: 12.h),
-                Image.asset(
-                  AppAssets.auth_logo,
-                  height: 180.h,
-                  width: 180.w,
-                ),
+                Image.asset(AppAssets.auth_logo, height: 180.h, width: 180.w),
                 SizedBox(height: 24.h),
                 Form(
                   key: formKey,
@@ -70,13 +67,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       CustomTextFormField(
                         textEditingController: nameController,
                         hintText: "Name".tr(),
-                        prefixIcon:
-                            Icon(Icons.person, color: Colors.grey, size: 22.sp),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty)
-                            return "Name is required".tr();
-                          return null;
-                        },
+                        prefixIcon: Icon(
+                          Icons.person,
+                          color: Colors.grey,
+                          size: 22.sp,
+                        ),
+                        validator: Validators.validateFullName,
                       ),
                       SizedBox(height: 16.h),
 
@@ -84,13 +80,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       CustomTextFormField(
                         textEditingController: emailController,
                         hintText: "Email".tr(),
-                        prefixIcon:
-                            Icon(Icons.email, color: Colors.grey, size: 22.sp),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty)
-                            return "Email is required".tr();
-                          return null;
-                        },
+                        prefixIcon: Icon(
+                          Icons.email,
+                          color: Colors.grey,
+                          size: 22.sp,
+                        ),
+                        validator: Validators.validateEmail,
                       ),
                       SizedBox(height: 16.h),
 
@@ -99,22 +94,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         textEditingController: passwordController,
                         hintText: "Password".tr(),
                         obscureText: _isPasswordHidden,
-                        prefixIcon:
-                            Icon(Icons.lock, color: Colors.grey, size: 22.sp),
+                        prefixIcon: Icon(
+                          Icons.lock,
+                          color: Colors.grey,
+                          size: 22.sp,
+                        ),
                         suffixIcon: IconButton(
                           onPressed: () => setState(
-                              () => _isPasswordHidden = !_isPasswordHidden),
+                            () => _isPasswordHidden = !_isPasswordHidden,
+                          ),
                           icon: Icon(
-                              _isPasswordHidden
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey),
+                            _isPasswordHidden
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty)
-                            return "Password is required".tr();
-                          return null;
-                        },
+                        validator: Validators.validatePassword,
                       ),
                       SizedBox(height: 16.h),
 
@@ -123,22 +119,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         textEditingController: rePasswordController,
                         hintText: "Re Password".tr(),
                         obscureText: _isRePasswordHidden,
-                        prefixIcon:
-                            Icon(Icons.lock, color: Colors.grey, size: 22.sp),
+                        prefixIcon: Icon(
+                          Icons.lock,
+                          color: Colors.grey,
+                          size: 22.sp,
+                        ),
                         suffixIcon: IconButton(
                           onPressed: () => setState(
-                              () => _isRePasswordHidden = !_isRePasswordHidden),
+                            () => _isRePasswordHidden = !_isRePasswordHidden,
+                          ),
                           icon: Icon(
-                              _isRePasswordHidden
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey),
+                            _isRePasswordHidden
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
                         ),
-                        validator: (value) {
-                          if (value != passwordController.text)
-                            return "Passwords do not match".tr();
-                          return null;
-                        },
+                        validator: (val) => Validators.validateConfirmPassword(
+                          val,
+                          passwordController.text,
+                        ),
                       ),
                       SizedBox(height: 24.h),
 
@@ -150,8 +150,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onPressed: signUp,
                           buttonText: Text(
                             "Create Account".tr(),
-                            style:
-                                AppStyles.bold20white.copyWith(fontSize: 20.sp),
+                            style: AppStyles.bold20white.copyWith(
+                              fontSize: 20.sp,
+                            ),
                           ),
                         ),
                       ),
@@ -164,11 +165,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Text(
                             "Already Have Account ? ".tr(),
                             style: TextStyle(
-                                fontSize: 16.sp, fontWeight: FontWeight.w500),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           GestureDetector(
                             onTap: () => Navigator.pushNamed(
-                                context, AppRoutes.signInRoute),
+                              context,
+                              AppRoutes.signInRoute,
+                            ),
                             child: Text(
                               "Login".tr(),
                               style: AppStyles.medium16blue.copyWith(
@@ -192,10 +197,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             CircleAvatar(
-                                radius: 15.r, child: const Text("🇺🇸")),
+                              radius: 15.r,
+                              child: const Text("🇺🇸"),
+                            ),
                             SizedBox(width: 8.w),
                             CircleAvatar(
-                                radius: 15.r, child: const Text("🇪🇬")),
+                              radius: 15.r,
+                              child: const Text("🇪🇬"),
+                            ),
                           ],
                         ),
                       ),

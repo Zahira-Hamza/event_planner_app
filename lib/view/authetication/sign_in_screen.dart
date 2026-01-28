@@ -6,8 +6,9 @@ import '../../core/utils/app_assets.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_routes.dart';
 import '../../core/utils/app_styles.dart';
+import '../../core/utils/validators.dart';
 import '../../core/widgets/custom_elavated button.dart';
-import '../../core/widgets/custom_text_field.dart';
+import '../../core/widgets/custom_text_form_field.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -42,11 +43,7 @@ class _LoginScreenState extends State<SignInScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Image.asset(
-                  AppAssets.auth_logo,
-                  height: 180.h,
-                  width: 180.w,
-                ),
+                Image.asset(AppAssets.auth_logo, height: 180.h, width: 180.w),
                 SizedBox(height: 24.h),
                 Form(
                   key: formKey,
@@ -55,37 +52,36 @@ class _LoginScreenState extends State<SignInScreen> {
                     children: [
                       CustomTextFormField(
                         textEditingController: emailController,
-                        validator: (text) {
-                          if (text == null || text.trim().isEmpty) {
-                            return "Email is required".tr();
-                          }
-                          return null;
-                        },
+                        validator: Validators.validateEmail,
                         hintText: "Email".tr(),
-                        prefixIcon:
-                            Icon(Icons.email, color: Colors.grey, size: 20.sp),
+                        prefixIcon: Icon(
+                          Icons.email,
+                          color: Colors.grey,
+                          size: 20.sp,
+                        ),
                       ),
                       SizedBox(height: 16.h),
 
                       CustomTextFormField(
                         textEditingController: passwordController,
-                        validator: (text) {
-                          if (text == null || text.trim().isEmpty)
-                            return "Password is required".tr();
-                          return null;
-                        },
+                        validator: Validators.validatePassword,
                         obscureText: _isPasswordHidden,
                         hintText: "Password".tr(),
-                        prefixIcon:
-                            Icon(Icons.lock, color: Colors.grey, size: 20.sp),
+                        prefixIcon: Icon(
+                          Icons.lock,
+                          color: Colors.grey,
+                          size: 20.sp,
+                        ),
                         suffixIcon: IconButton(
                           onPressed: () => setState(
-                              () => _isPasswordHidden = !_isPasswordHidden),
+                            () => _isPasswordHidden = !_isPasswordHidden,
+                          ),
                           icon: Icon(
-                              _isPasswordHidden
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey),
+                            _isPasswordHidden
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
 
@@ -94,7 +90,9 @@ class _LoginScreenState extends State<SignInScreen> {
                         child: TextButton(
                           onPressed: () {
                             Navigator.pushNamed(
-                                context, AppRoutes.forgetPasswordRoute);
+                              context,
+                              AppRoutes.forgetPasswordRoute,
+                            );
                           },
                           child: Text(
                             "Forget Password?".tr(),
@@ -114,8 +112,9 @@ class _LoginScreenState extends State<SignInScreen> {
                           onPressed: login,
                           buttonText: Text(
                             "Login".tr(),
-                            style:
-                                AppStyles.bold20white.copyWith(fontSize: 20.sp),
+                            style: AppStyles.bold20white.copyWith(
+                              fontSize: 20.sp,
+                            ),
                           ),
                         ),
                       ),
@@ -127,17 +126,22 @@ class _LoginScreenState extends State<SignInScreen> {
                           Text(
                             "Don’t Have Account ?".tr(),
                             style: TextStyle(
-                                fontSize: 16.sp, fontWeight: FontWeight.w500),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pushNamed(
-                                context, AppRoutes.signUpRoute),
+                              context,
+                              AppRoutes.signUpRoute,
+                            ),
                             child: Text(
                               "Create Account".tr(),
-                              style: AppStyles.medium16blue
-                                  .copyWith(fontSize: 16.sp),
+                              style: AppStyles.medium16blue.copyWith(
+                                fontSize: 16.sp,
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
 
@@ -148,8 +152,10 @@ class _LoginScreenState extends State<SignInScreen> {
                             const Expanded(child: Divider()),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10.w),
-                              child: Text("Or".tr(),
-                                  style: TextStyle(fontSize: 14.sp)),
+                              child: Text(
+                                "Or".tr(),
+                                style: TextStyle(fontSize: 14.sp),
+                              ),
                             ),
                             const Expanded(child: Divider()),
                           ],
@@ -163,8 +169,9 @@ class _LoginScreenState extends State<SignInScreen> {
                           height: 56.h,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.r),
-                            border:
-                                Border.all(color: AppColors.bluePrimaryColor),
+                            border: Border.all(
+                              color: AppColors.bluePrimaryColor,
+                            ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -173,8 +180,9 @@ class _LoginScreenState extends State<SignInScreen> {
                               SizedBox(width: 12.w),
                               Text(
                                 "Login With Google".tr(),
-                                style: AppStyles.medium16blue
-                                    .copyWith(fontSize: 18.sp),
+                                style: AppStyles.medium16blue.copyWith(
+                                  fontSize: 18.sp,
+                                ),
                               ),
                             ],
                           ),

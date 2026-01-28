@@ -56,7 +56,10 @@
   "Location": "Location",
   "Personalize Your Experience": "Personalize Your Experience",
   "Forgot Password": "Forgot Password",
-  "Reset Password": "Reset Password"
+  "Reset Password": "Reset Password",
+  "Please enter your Email": "Please enter your Email",
+  "Please enter a valid Email": "Please enter a valid Email"
+
 
 
 }
