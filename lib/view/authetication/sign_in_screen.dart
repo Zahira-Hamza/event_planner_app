@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:event_planner_app/core/widgets/custom_alert_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -139,6 +141,7 @@ class _LoginScreenState extends State<SignInScreen> {
                               "Create Account".tr(),
                               style: AppStyles.medium16blue.copyWith(
                                 fontSize: 16.sp,
+                                decoration: TextDecoration.underline,
                               ),
                             ),
                           ),
@@ -217,9 +220,59 @@ class _LoginScreenState extends State<SignInScreen> {
     );
   }
 
-  void login() {
-    if (formKey.currentState!.validate()) {
-      Navigator.pushReplacementNamed(context, AppRoutes.homeRoute);
+  void login() async {
+    //todo:show loading
+    CustomAlertDialog.showLoading(context: context, loadingText: 'loading...');
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      //todo:hide loading
+      CustomAlertDialog.hideLoading(context);
+      //todo:show message
+      CustomAlertDialog.showMessage(
+        context: context,
+        message: 'Login Success',
+        title: 'Success',
+        postActionName: 'ok',
+        onPostActionPressed: () {
+          Navigator.pushNamed(context, AppRoutes.homeRoute);
+        },
+      );
+      print("sign in succeed");
+      print("id: ${credential.user!.uid}");
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-credential') {
+        //todo:hide loading
+        CustomAlertDialog.hideLoading(context);
+        //todo:show Message
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: 'invalid email or password',
+        );
+      } else if (e.code == 'network-request-failed') {
+        //todo:hide loading
+        CustomAlertDialog.hideLoading(context);
+        //todo:show Message
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: 'Network request failed.',
+          title: 'Error',
+          postActionName: 'ok',
+        );
+      }
+    } catch (e) {
+      //todo:hide loading
+      CustomAlertDialog.hideLoading(context);
+      //todo:show Message
+      CustomAlertDialog.showMessage(
+        context: context,
+        message: '${e.toString()}',
+        title: 'Error',
+        postActionName: 'ok',
+      );
+      print(e.toString());
     }
   }
 }

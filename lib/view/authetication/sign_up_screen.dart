@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -7,6 +8,7 @@ import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_routes.dart';
 import '../../core/utils/app_styles.dart';
 import '../../core/utils/validators.dart';
+import '../../core/widgets/custom_alert_dialog.dart';
 import '../../core/widgets/custom_elavated button.dart';
 import '../../core/widgets/custom_text_form_field.dart';
 
@@ -219,10 +221,76 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  void signUp() {
+  void signUp() async {
     if (formKey.currentState!.validate()) {
-      // Handle local sign up logic
-      print("Account Created for: ${nameController.text}");
+      //todo:register
+      //todo:show loading
+      CustomAlertDialog.showLoading(
+        context: context,
+        loadingText: 'loading...',
+      );
+      try {
+        final credential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+              email: emailController.text,
+              password: passwordController.text,
+            );
+        //todo:hide loading
+        CustomAlertDialog.hideLoading(context);
+        //todo:show Message(success)
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: 'Register Success',
+          title: 'Success',
+          postActionName: 'ok',
+          onPostActionPressed: () {
+            Navigator.pushNamed(context, AppRoutes.signInRoute);
+          },
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          //todo:hide loading
+          CustomAlertDialog.hideLoading(context);
+          //todo:show Message
+          CustomAlertDialog.showMessage(
+            context: context,
+            message: 'weak-password',
+            title: 'Error',
+            postActionName: 'ok',
+          );
+        } else if (e.code == 'email-already-in-use') {
+          //todo:hide loading
+          CustomAlertDialog.hideLoading(context);
+          //todo:show Message
+          CustomAlertDialog.showMessage(
+            context: context,
+            message: 'The account already exists for that email.',
+            title: 'Error',
+            postActionName: 'ok',
+          );
+        } else if (e.code == 'network-request-failed') {
+          //todo:hide loading
+          CustomAlertDialog.hideLoading(context);
+          //todo:show Message
+          CustomAlertDialog.showMessage(
+            context: context,
+            message: 'Network request failed.',
+            title: 'Error',
+            postActionName: 'ok',
+          );
+        }
+      } catch (e) {
+        //todo:hide loading
+        CustomAlertDialog.hideLoading(context);
+        //todo:show Message
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: '${e.toString()}',
+          title: 'Error',
+          postActionName: 'ok',
+        );
+        print(e.toString());
+      }
     }
   }
 }
