@@ -1,14 +1,17 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:event_planner_app/core/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/utils/app_colors.dart';
-import 'Home_Tab/home_tab.dart';
+import 'Home_Tab/home_tab_screen.dart';
+import 'Profile_Tab/profile_tab_screen.dart';
 
 // Import your tab screens here
-// import 'home_tab.dart';
+// import 'home_tab_screen.dart';
 // import 'map_tab.dart';
 // import 'love_tab.dart';
-// import 'profile_tab.dart';
+// import 'profile_tab_screen.dart';
 
 class BottomNavBarWrapper extends StatefulWidget {
   const BottomNavBarWrapper({super.key});
@@ -25,7 +28,7 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
     const HomeTab(), // The implementation for this is below
     const Center(child: Text("Map")),
     const Center(child: Text("Favorites")),
-    const Center(child: Text("Profile")),
+    const ProfileTabScreen(),
   ];
 
   @override
@@ -41,7 +44,9 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
           border: Border.all(color: Colors.white, width: 4.w),
         ),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, AppRoutes.createEventRoute);
+          },
           backgroundColor: AppColors.bluePrimaryColor,
           elevation: 0,
           shape: const CircleBorder(),
@@ -58,11 +63,21 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildNavItem(Icons.home_outlined, Icons.home, "Home", 0),
-              _buildNavItem(Icons.map_outlined, Icons.map, "Map", 1),
+              _buildNavItem(Icons.home_outlined, Icons.home, "Home".tr(), 0),
+              _buildNavItem(Icons.map_outlined, Icons.map, "Map".tr(), 1),
               SizedBox(width: 35.w), // Space for FAB
-              _buildNavItem(Icons.favorite_border, Icons.favorite, "Love", 2),
-              _buildNavItem(Icons.person_outline, Icons.person, "Profile", 3),
+              _buildNavItem(
+                Icons.favorite_border,
+                Icons.favorite,
+                "Love".tr(),
+                2,
+              ),
+              _buildNavItem(
+                Icons.person_outline,
+                Icons.person,
+                "Profile".tr(),
+                3,
+              ),
             ],
           ),
         ),
