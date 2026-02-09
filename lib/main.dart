@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:event_planner_app/view/Home/Home_Tab/create_event_screen.dart';
+import 'package:event_planner_app/view/Home/Home_Tab/Events/create_event_screen.dart';
 import 'package:event_planner_app/view/Home/Profile_Tab/profile_tab_screen.dart';
 import 'package:event_planner_app/view/Home/bottom_nav_bar_wrapper.dart';
 import 'package:event_planner_app/view/authetication/forget_password_screen.dart';
@@ -21,6 +21,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await EasyLocalization.ensureInitialized();
+  //* caching on the phone not using the network
   await FirebaseFirestore.instance.disableNetwork();
   runApp(
     EasyLocalization(

@@ -1,12 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:event_planner_app/view/Home/Home_Tab/widgets/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../core/Firebase-Firestore/firebase_utils.dart';
+import '../../../core/Firebase-Firestore/models/event.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_styles.dart';
 import 'widgets/event_category_tab_item.dart';
-// Assuming you have an EventItem widget and an Event model defined locally
-// import 'event_item.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -18,13 +20,7 @@ class HomeTab extends StatefulWidget {
 class _HomeTabScreenState extends State<HomeTab> {
   int selectedIndex = 0;
 
-  // Local dummy data to replace the provider
-  final List<String> dummyEvents = [
-    "Birthday Party",
-    "Meeting for Development",
-    "Art Exhibition",
-    "Gaming Night",
-  ];
+  //* List<Event> eventsList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -141,29 +137,57 @@ class _HomeTabScreenState extends State<HomeTab> {
       body: Column(
         children: [
           Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(top: 14.h),
-              child: ListView.separated(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                itemBuilder: (context, index) {
-                  // Replace with your actual EventItem widget
-                  return Container(
-                    height: 200.h,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(dummyEvents[index % dummyEvents.length]),
-                  );
-                },
-                separatorBuilder: (context, index) => SizedBox(height: 16.h),
-                itemCount: 10, // Static count for UI testing
-              ),
+            child: StreamBuilder<QuerySnapshot<Event>>(
+              // 1. Listen to snapshots (Real-time)
+              stream: FirebaseUtils.getEventsCollection().snapshots(),
+              builder: (context, snapshot) {
+                // 2. Handle Loading state
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                // 3. Handle Error state
+                if (snapshot.hasError) {
+                  return Center(child: Text("Something went wrong".tr()));
+                }
+
+                // 4. Extract data
+                var eventsList =
+                    snapshot.data?.docs.map((doc) => doc.data()).toList() ?? [];
+
+                // 5. Handle Empty state
+                if (eventsList.isEmpty) {
+                  return Center(child: Text("No Events Found".tr()));
+                }
+
+                return ListView.separated(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 14.h,
+                  ),
+                  itemBuilder: (context, index) =>
+                      EventItem(event: eventsList[index]),
+                  separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                  itemCount: eventsList.length,
+                );
+              },
             ),
           ),
         ],
       ),
     );
   }
+
+  //* void getAllEvents() async {
+  //   QuerySnapshot<Event> querySnapshot =
+  //       await FirebaseUtils.getEventsCollection()
+  //           .get(); //* one time read=>real time read
+  //   setState(() {
+  //     eventsList = querySnapshot.docs.map((doc) => doc.data()).toList();
+  //   });
+  // }
 }
+
+//* Feature:  get() + setState()    =>     snapshots() + StreamBuilder(*Remove the eventsList variable and the getAllEvents call from build and This handles the "snapshots" and the "rebuilds" automatically)
+// Data Type: Future (One-time fetch)     Stream (Real-time updates)
+// UI Updates:Manual (must call setState)  Automatic (built into the widget)
+// Complexity:Higher (handling lifecycles)   Lower (cleaner code)

@@ -1,17 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:event_planner_app/view/Home/Home_Tab/Events/widgets/event_date_time_widget.dart';
 import 'package:event_planner_app/view/Home/Home_Tab/widgets/event_category_tab_item.dart';
-import 'package:event_planner_app/view/Home/Home_Tab/widgets/event_date_time_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../core/Firebase-Firestore/firebase_utils.dart';
-import '../../../core/Firebase-Firestore/models/event.dart';
-import '../../../core/utils/app_assets.dart';
-import '../../../core/utils/app_colors.dart';
-import '../../../core/utils/app_styles.dart';
-import '../../../core/utils/validators.dart';
-import '../../../core/widgets/custom_elavated button.dart';
-import '../../../core/widgets/custom_text_form_field.dart';
+import '../../../../core/Firebase-Firestore/firebase_utils.dart';
+import '../../../../core/Firebase-Firestore/models/event.dart';
+import '../../../../core/utils/app_assets.dart';
+import '../../../../core/utils/app_colors.dart';
+import '../../../../core/utils/app_styles.dart';
+import '../../../../core/utils/toast_utils.dart';
+import '../../../../core/utils/validators.dart';
+import '../../../../core/widgets/custom_elavated button.dart';
+import '../../../../core/widgets/custom_text_form_field.dart';
 
 // Assuming these paths based on your previous messages
 
@@ -278,7 +279,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         Duration(milliseconds: 500),
         onTimeout: () {
           //todo: Logic for adding event locally or just navigating back
-          print("Event Created: ${titleController.text}");
+          ToastUtils.showToast(message: "Event Added Successfully".tr());
           Navigator.of(context).pop();
         },
       );
