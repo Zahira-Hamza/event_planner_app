@@ -1,13 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_planner_app/view/Home/Home_Tab/widgets/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
-import '../../../core/Firebase-Firestore/firebase_utils.dart';
-import '../../../core/Firebase-Firestore/models/event.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../view_model/providers/event_list_provider.dart';
 import 'widgets/event_category_tab_item.dart';
 
 class HomeTab extends StatefulWidget {
@@ -18,25 +17,17 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabScreenState extends State<HomeTab> {
-  int selectedIndex = 0;
-
-  //* List<Event> eventsList = [];
+  @override
+  void initState() {
+    super.initState();
+    // Start listening to Firebase when the screen opens
+    Provider.of<EventListProvider>(context, listen: false).listenToEvents();
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> eventsName = [
-      'All'.tr(),
-      'Sport'.tr(),
-      'Birthday'.tr(),
-      'Meeting'.tr(),
-      'Gaming'.tr(),
-      'WorkShop'.tr(),
-      'BookClub'.tr(),
-      'Exhibition'.tr(),
-      'Holiday'.tr(),
-      'Eating'.tr(),
-    ];
-
+    // Watch the provider for changes
+    var provider = Provider.of<EventListProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.bluePrimaryColor,
@@ -102,7 +93,7 @@ class _HomeTabScreenState extends State<HomeTab> {
                 ),
                 SizedBox(height: 12.h),
                 DefaultTabController(
-                  length: eventsName.length,
+                  length: provider.eventsName.length,
                   child: TabBar(
                     indicatorColor: Colors.transparent,
                     dividerColor: Colors.transparent,
@@ -110,11 +101,11 @@ class _HomeTabScreenState extends State<HomeTab> {
                     tabAlignment: TabAlignment.start,
                     onTap: (index) {
                       setState(() {
-                        selectedIndex = index;
+                        provider.changeSelectedIndex(index);
                       });
                     },
                     isScrollable: true,
-                    tabs: eventsName.asMap().entries.map((entry) {
+                    tabs: provider.eventsName.asMap().entries.map((entry) {
                       return EventCategoryTabItem(
                         selectedTextStyle: Theme.of(
                           context,
@@ -122,7 +113,7 @@ class _HomeTabScreenState extends State<HomeTab> {
                         unselectedTextStyle: Theme.of(
                           context,
                         ).textTheme.headlineSmall!,
-                        isSelected: selectedIndex == entry.key,
+                        isSelected: provider.selectedIndex == entry.key,
                         event: entry.value,
                         selectedBgColor: Colors.white,
                       );
@@ -134,46 +125,15 @@ class _HomeTabScreenState extends State<HomeTab> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot<Event>>(
-              // 1. Listen to snapshots (Real-time)
-              stream: FirebaseUtils.getEventsCollection().snapshots(),
-              builder: (context, snapshot) {
-                // 2. Handle Loading state
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                // 3. Handle Error state
-                if (snapshot.hasError) {
-                  return Center(child: Text("Something went wrong".tr()));
-                }
-
-                // 4. Extract data
-                var eventsList =
-                    snapshot.data?.docs.map((doc) => doc.data()).toList() ?? [];
-
-                // 5. Handle Empty state
-                if (eventsList.isEmpty) {
-                  return Center(child: Text("No Events Found".tr()));
-                }
-
-                return ListView.separated(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 14.h,
-                  ),
-                  itemBuilder: (context, index) =>
-                      EventItem(event: eventsList[index]),
-                  separatorBuilder: (context, index) => SizedBox(height: 16.h),
-                  itemCount: eventsList.length,
-                );
-              },
+      body: provider.filterEventsList.isEmpty
+          ? Center(child: Text("No Events Found".tr()))
+          : ListView.separated(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              itemBuilder: (context, index) =>
+                  EventItem(event: provider.filterEventsList[index]),
+              separatorBuilder: (context, index) => SizedBox(height: 16.h),
+              itemCount: provider.filterEventsList.length,
             ),
-          ),
-        ],
-      ),
     );
   }
 

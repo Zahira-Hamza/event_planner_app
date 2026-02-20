@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
-import '../../../../view_model/Theme_Provider/app_theme_provider.dart';
+import '../../../../view_model/providers/Theme_Provider/app_theme_provider.dart';
 
 class ThemeBottomSheet extends StatelessWidget {
   const ThemeBottomSheet({super.key});

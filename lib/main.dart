@@ -6,8 +6,9 @@ import 'package:event_planner_app/view/Home/bottom_nav_bar_wrapper.dart';
 import 'package:event_planner_app/view/authetication/forget_password_screen.dart';
 import 'package:event_planner_app/view/authetication/sign_in_screen.dart';
 import 'package:event_planner_app/view/authetication/sign_up_screen.dart';
-import 'package:event_planner_app/view_model/Language_Provider/app_language_provider.dart';
-import 'package:event_planner_app/view_model/Theme_Provider/app_theme_provider.dart';
+import 'package:event_planner_app/view_model/providers/Language_Provider/app_language_provider.dart';
+import 'package:event_planner_app/view_model/providers/Theme_Provider/app_theme_provider.dart';
+import 'package:event_planner_app/view_model/providers/event_list_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // Add this
@@ -32,6 +33,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => AppLanguageProvider()),
           ChangeNotifierProvider(create: (_) => AppThemeProvider()),
+          ChangeNotifierProvider(create: (_) => EventListProvider()),
         ],
         child: const MyApp(),
       ),

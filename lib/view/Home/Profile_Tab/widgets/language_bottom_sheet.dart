@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/utils/app_colors.dart';
-import '../../../../view_model/Language_Provider/app_language_provider.dart';
+import '../../../../view_model/providers/Language_Provider/app_language_provider.dart';
 
 class LanguageBottomSheet extends StatelessWidget {
   const LanguageBottomSheet({super.key});

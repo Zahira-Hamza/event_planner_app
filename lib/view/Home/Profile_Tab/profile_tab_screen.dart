@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_styles.dart';
-import '../../../view_model/Language_Provider/app_language_provider.dart';
-import '../../../view_model/Theme_Provider/app_theme_provider.dart';
+import '../../../view_model/providers/Language_Provider/app_language_provider.dart';
+import '../../../view_model/providers/Theme_Provider/app_theme_provider.dart';
 
 class ProfileTabScreen extends StatefulWidget {
   const ProfileTabScreen({super.key});
