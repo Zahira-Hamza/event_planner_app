@@ -1,10 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/Firebase-Firestore/models/event.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_styles.dart';
+import '../../../../view_model/providers/event_list_provider.dart';
 import '../Events/event_details_screen.dart'; // Add this
 
 class EventItem extends StatelessWidget {
@@ -82,10 +84,17 @@ class EventItem extends StatelessWidget {
                   // Fixed Favorite Icon logic
                   InkWell(
                     onTap: () {
-                      // Handle Favorite logic here
+                      // This call triggers the toggle logic in Provider
+                      Provider.of<EventListProvider>(
+                        context,
+                        listen: false,
+                      ).toggleFavorite(event);
                     },
                     child: Icon(
-                      Icons.favorite_border_rounded, // Use border by default
+                      // TERNARY CONDITION for the icon
+                      event.isFavorite
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
                       color: AppColors.bluePrimaryColor,
                       size: 24.r,
                     ),

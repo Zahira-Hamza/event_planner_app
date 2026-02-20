@@ -4,10 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/app_styles.dart';
 
 typedef OnValidator = String? Function(String?)?;
+//* for searching field
+typedef OnChanged = void Function(String)?;
 
 class CustomTextFormField extends StatelessWidget {
   final Color borderColor;
   final String? hintText;
+  final TextStyle? hintStyle;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final OnValidator? validator;
@@ -15,11 +18,14 @@ class CustomTextFormField extends StatelessWidget {
   final TextEditingController textEditingController;
   final TextInputType keyboardType;
   final int? maxLines;
+  final OnChanged? onChanged;
 
   const CustomTextFormField({
     super.key,
+    this.onChanged,
     this.borderColor = Colors.grey,
     this.hintText,
+    this.hintStyle,
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
@@ -33,6 +39,7 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: textEditingController,
+      onChanged: onChanged,
       validator: validator,
       obscureText: obscureText,
       keyboardType: keyboardType,

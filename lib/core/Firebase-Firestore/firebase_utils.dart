@@ -20,4 +20,11 @@ class FirebaseUtils {
     return docRef.set(event); //add to fireStore
     ///getEventsCollection().doc().set(event);
   }
+
+  // Inside FirebaseUtils class
+  static Future<void> updateFavoriteStatus(String eventId, bool isFavorite) {
+    return getEventsCollection().doc(eventId).update({
+      'isFavorite': isFavorite,
+    });
+  }
 }

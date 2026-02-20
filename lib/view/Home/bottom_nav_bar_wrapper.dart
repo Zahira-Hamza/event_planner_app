@@ -6,12 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/utils/app_colors.dart';
 import 'Home_Tab/home_tab_screen.dart';
 import 'Profile_Tab/profile_tab_screen.dart';
-
-// Import your tab screens here
-// import 'home_tab_screen.dart';
-// import 'map_tab.dart';
-// import 'love_tab.dart';
-// import 'profile_tab_screen.dart';
+import 'love_tab/love_tab_screen.dart';
 
 class BottomNavBarWrapper extends StatefulWidget {
   const BottomNavBarWrapper({super.key});
@@ -27,7 +22,7 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
   final List<Widget> _tabs = [
     const HomeTab(), // The implementation for this is below
     const Center(child: Text("Map")),
-    const Center(child: Text("Favorites")),
+    LoveTabScreen(),
     const ProfileTabScreen(),
   ];
 
