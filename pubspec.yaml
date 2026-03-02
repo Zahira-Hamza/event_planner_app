@@ -44,6 +44,11 @@ dependencies:
   cloud_firestore: ^6.1.2
   provider: ^6.1.5+1
   fluttertoast: ^9.0.0
+  location: ^8.0.1
+  google_maps_flutter: ^2.14.2
+  google_sign_in: ^7.2.0
+  flutter_dotenv: ^6.0.0
+  geocoding: ^4.0.0
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +76,7 @@ flutter:
   assets:
     - assets/images/
     - assets/translations/
+    - .env
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_planner_app/core/utils/app_routes.dart';
+import 'package:event_planner_app/view/Home/map_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -21,7 +22,7 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
   // List of screens for each tab
   final List<Widget> _tabs = [
     const HomeTab(), // The implementation for this is below
-    const Center(child: Text("Map")),
+    MapTab(),
     LoveTabScreen(),
     const ProfileTabScreen(),
   ];

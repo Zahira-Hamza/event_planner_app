@@ -9,6 +9,8 @@ class Event {
   DateTime dateTime;
   String time;
   bool isFavorite;
+  double lat;
+  double long;
 
   Event({
     this.id = "",
@@ -19,6 +21,8 @@ class Event {
     required this.dateTime,
     required this.time,
     this.isFavorite = false,
+    this.lat = 0,
+    this.long = 0,
   });
 
   //todo:json=>object   ///from fireStore(الداتا اللى جايالى)
@@ -32,6 +36,8 @@ class Event {
         dateTime: DateTime.fromMillisecondsSinceEpoch(jsonData['dateTime']),
         time: jsonData['time'],
         isFavorite: jsonData['isFavorite'],
+        lat: jsonData['lat'] ?? 0,
+        long: jsonData['long'] ?? 0,
       );
 
   //todo:object=>json
@@ -48,6 +54,8 @@ class Event {
       ///string(object of dateTime)->int to do any operation on the time
       'time': time,
       'isFavorite': isFavorite,
+      'lat': lat,
+      'long': long,
     };
   }
 }

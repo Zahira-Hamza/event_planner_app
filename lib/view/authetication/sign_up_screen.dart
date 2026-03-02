@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../core/Firebase-Firestore/firebase_auth_utils.dart';
 import '../../core/utils/app_assets.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_routes.dart';
@@ -65,7 +66,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   key: formKey,
                   child: Column(
                     children: [
-                      /// Name Field
                       CustomTextFormField(
                         textEditingController: nameController,
                         hintText: "Name".tr(),
@@ -77,8 +77,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         validator: Validators.validateFullName,
                       ),
                       SizedBox(height: 16.h),
-
-                      /// Email Field
                       CustomTextFormField(
                         textEditingController: emailController,
                         hintText: "Email".tr(),
@@ -90,8 +88,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         validator: Validators.validateEmail,
                       ),
                       SizedBox(height: 16.h),
-
-                      /// Password Field
                       CustomTextFormField(
                         textEditingController: passwordController,
                         hintText: "Password".tr(),
@@ -115,8 +111,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         validator: Validators.validatePassword,
                       ),
                       SizedBox(height: 16.h),
-
-                      /// Re-Password Field
                       CustomTextFormField(
                         textEditingController: rePasswordController,
                         hintText: "Re Password".tr(),
@@ -143,8 +137,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       SizedBox(height: 24.h),
-
-                      /// Create Account Button
                       SizedBox(
                         width: double.infinity,
                         height: 56.h,
@@ -159,8 +151,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       SizedBox(height: 16.h),
-
-                      /// Already Have Account Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -187,29 +177,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ],
                       ),
                       SizedBox(height: 20.h),
-
-                      /// Language Toggle (Simplified Placeholder for the UI at the bottom)
-                      Container(
-                        padding: EdgeInsets.all(4.r),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.bluePrimaryColor),
-                          borderRadius: BorderRadius.circular(25.r),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircleAvatar(
-                              radius: 15.r,
-                              child: const Text("🇺🇸"),
-                            ),
-                            SizedBox(width: 8.w),
-                            CircleAvatar(
-                              radius: 15.r,
-                              child: const Text("🇪🇬"),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -223,73 +190,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void signUp() async {
     if (formKey.currentState!.validate()) {
-      //todo:register
-      //todo:show loading
       CustomAlertDialog.showLoading(
         context: context,
         loadingText: 'loading...',
       );
       try {
-        final credential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-              email: emailController.text,
-              password: passwordController.text,
-            );
-        //todo:hide loading
+        await FirebaseAuthUtils.signUp(
+          email: emailController.text,
+          password: passwordController.text,
+        );
         CustomAlertDialog.hideLoading(context);
-        //todo:show Message(success)
         CustomAlertDialog.showMessage(
           context: context,
           message: 'Register Success',
           title: 'Success',
           postActionName: 'ok',
-          onPostActionPressed: () {
-            Navigator.pushNamed(context, AppRoutes.signInRoute);
-          },
+          onPostActionPressed: () =>
+              Navigator.pushReplacementNamed(context, AppRoutes.signInRoute),
         );
       } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          //todo:hide loading
-          CustomAlertDialog.hideLoading(context);
-          //todo:show Message
-          CustomAlertDialog.showMessage(
-            context: context,
-            message: 'weak-password',
-            title: 'Error',
-            postActionName: 'ok',
-          );
-        } else if (e.code == 'email-already-in-use') {
-          //todo:hide loading
-          CustomAlertDialog.hideLoading(context);
-          //todo:show Message
-          CustomAlertDialog.showMessage(
-            context: context,
-            message: 'The account already exists for that email.',
-            title: 'Error',
-            postActionName: 'ok',
-          );
-        } else if (e.code == 'network-request-failed') {
-          //todo:hide loading
-          CustomAlertDialog.hideLoading(context);
-          //todo:show Message
-          CustomAlertDialog.showMessage(
-            context: context,
-            message: 'Network request failed.',
-            title: 'Error',
-            postActionName: 'ok',
-          );
-        }
-      } catch (e) {
-        //todo:hide loading
         CustomAlertDialog.hideLoading(context);
-        //todo:show Message
+        String errorMsg = 'An error occurred';
+        if (e.code == 'weak-password')
+          errorMsg = 'The password provided is too weak.';
+        if (e.code == 'email-already-in-use')
+          errorMsg = 'The account already exists for that email.';
+        if (e.code == 'network-request-failed')
+          errorMsg = 'Network request failed.';
+
         CustomAlertDialog.showMessage(
           context: context,
-          message: '${e.toString()}',
+          message: errorMsg,
           title: 'Error',
-          postActionName: 'ok',
         );
-        print(e.toString());
+      } catch (e) {
+        CustomAlertDialog.hideLoading(context);
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: e.toString(),
+          title: 'Error',
+        );
       }
     }
   }

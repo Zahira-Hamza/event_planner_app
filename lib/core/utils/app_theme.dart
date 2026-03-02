@@ -48,13 +48,13 @@ class AppTheme {
     ),
 
     ///floating action button theme////////////////
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.bluePrimaryColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-        side: BorderSide(color: AppColors.whitePrimaryColor, width: 4),
-      ),
-    ),
+    // floatingActionButtonTheme: FloatingActionButtonThemeData(
+    //   backgroundColor: AppColors.bluePrimaryColor,
+    //   shape: RoundedRectangleBorder(
+    //     borderRadius: BorderRadius.circular(30),
+    //     side: BorderSide(color: AppColors.whitePrimaryColor, width: 4),
+    //   ),
+    // ),
   );
 
   static final ThemeData darkTheme = ThemeData(

@@ -6,4 +6,9 @@ class AppRoutes {
   static const String createEventRoute = "create_event_screen";
   static const String profileRoute = "profile_tab_screen";
   static const String mapRoute = "map_tab";
+  static const String loveRoute = "love_tab_screen";
+  static const String eventDetailsRoute = "event_details_screen";
+  static const String editEventRoute = "event_edit_screen";
+  static const String updateEventRoute = "update_event_screen";
+  static const String pickEventLocationRoute = "pick_event_location";
 }

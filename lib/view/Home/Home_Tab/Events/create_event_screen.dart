@@ -1,13 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_planner_app/view/Home/Home_Tab/Events/widgets/event_date_time_widget.dart';
 import 'package:event_planner_app/view/Home/Home_Tab/widgets/event_category_tab_item.dart';
+import 'package:event_planner_app/view_model/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/Firebase-Firestore/firebase_utils.dart';
 import '../../../../core/Firebase-Firestore/models/event.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/app_colors.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/app_styles.dart';
 import '../../../../core/utils/toast_utils.dart';
 import '../../../../core/utils/validators.dart';
@@ -33,14 +36,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   String formattedDate = '';
   TimeOfDay? selectedTime;
   String formattedTime = '';
-
   final formKey = GlobalKey<FormState>();
+  late AppProvider appProvider;
 
   @override
   void dispose() {
     titleController.dispose();
     descriptionController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    appProvider = Provider.of<AppProvider>(context, listen: false);
   }
 
   @override
@@ -181,29 +190,54 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 SizedBox(height: 8.h),
-                Container(
-                  padding: EdgeInsets.all(12.r),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.r),
-                    border: Border.all(color: AppColors.bluePrimaryColor),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        color: AppColors.bluePrimaryColor,
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.pickEventLocationRoute,
+                    );
+                  },
+                  child: Consumer<AppProvider>(
+                    builder: (context, provider, child) => Container(
+                      padding: EdgeInsets.all(12.r),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(color: AppColors.bluePrimaryColor),
                       ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        "Choose Event Location".tr(),
-                        style: AppStyles.medium16blue,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(10.r),
+                            decoration: BoxDecoration(
+                              color: AppColors.bluePrimaryColor,
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Icon(
+                              Icons.gps_fixed,
+                              color: Colors.white,
+                              size: 24.r,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Flexible(
+                            child: Text(
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              appProvider.eventLocation == null
+                                  ? "Choose Event Location".tr()
+                                  : (appProvider.eventAddress ??
+                                        "Fetching address..."), // Show address here
+                              style: AppStyles.medium16blue,
+                            ),
+                          ),
+                          const Spacer(),
+                          const Icon(
+                            Icons.navigate_next,
+                            color: AppColors.bluePrimaryColor,
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      const Icon(
-                        Icons.navigate_next,
-                        color: AppColors.bluePrimaryColor,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 32.h),
@@ -259,6 +293,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   void addEvent() {
+    if (appProvider.eventLocation == null) {
+      ToastUtils.showToast(message: "Please select event location".tr());
+    }
     if (formKey.currentState?.validate() == true) {
       if (selectedDate == null || selectedTime == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -274,6 +311,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         eventName: selectedEventName!,
         dateTime: selectedDate!,
         time: formattedTime,
+        lat: appProvider.eventLocation?.latitude ?? 0,
+        long: appProvider.eventLocation?.longitude ?? 0,
       );
       FirebaseUtils.addEventToFireStore(event).timeout(
         Duration(milliseconds: 500),

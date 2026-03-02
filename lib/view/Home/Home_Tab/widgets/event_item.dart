@@ -17,10 +17,15 @@ class EventItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      // Inside EventItem class
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const EventDetailsScreen()),
+          MaterialPageRoute(
+            builder: (context) => const EventDetailsScreen(),
+            // Pass the event object as an argument
+            settings: RouteSettings(arguments: event),
+          ),
         );
       },
       child: Container(

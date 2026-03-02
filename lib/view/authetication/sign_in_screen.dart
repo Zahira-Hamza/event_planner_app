@@ -1,14 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:event_planner_app/core/widgets/custom_alert_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../core/Firebase-Firestore/firebase_auth_utils.dart';
 import '../../core/utils/app_assets.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_routes.dart';
 import '../../core/utils/app_styles.dart';
 import '../../core/utils/validators.dart';
+import '../../core/widgets/custom_alert_dialog.dart';
 import '../../core/widgets/custom_elavated button.dart';
 import '../../core/widgets/custom_text_form_field.dart';
 
@@ -16,10 +17,10 @@ class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _LoginScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _LoginScreenState extends State<SignInScreen> {
+class _SignInScreenState extends State<SignInScreen> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -38,10 +39,7 @@ class _LoginScreenState extends State<SignInScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 20.h, // Scaled absolute pixels
-            horizontal: 20.w,
-          ),
+          padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -63,7 +61,6 @@ class _LoginScreenState extends State<SignInScreen> {
                         ),
                       ),
                       SizedBox(height: 16.h),
-
                       CustomTextFormField(
                         textEditingController: passwordController,
                         validator: Validators.validatePassword,
@@ -86,16 +83,13 @@ class _LoginScreenState extends State<SignInScreen> {
                           ),
                         ),
                       ),
-
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.forgetPasswordRoute,
-                            );
-                          },
+                          onPressed: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.forgetPasswordRoute,
+                          ),
                           child: Text(
                             "Forget Password?".tr(),
                             style: AppStyles.medium16blue.copyWith(
@@ -106,7 +100,6 @@ class _LoginScreenState extends State<SignInScreen> {
                         ),
                       ),
                       SizedBox(height: 10.h),
-
                       SizedBox(
                         width: double.infinity,
                         height: 56.h,
@@ -121,7 +114,6 @@ class _LoginScreenState extends State<SignInScreen> {
                         ),
                       ),
                       SizedBox(height: 10.h),
-
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -147,7 +139,6 @@ class _LoginScreenState extends State<SignInScreen> {
                           ),
                         ],
                       ),
-
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 20.h),
                         child: Row(
@@ -164,10 +155,8 @@ class _LoginScreenState extends State<SignInScreen> {
                           ],
                         ),
                       ),
-
-                      /// Google login button
                       InkWell(
-                        onTap: () {},
+                        onTap: loginWithGoogle,
                         child: Container(
                           height: 56.h,
                           decoration: BoxDecoration(
@@ -194,24 +183,6 @@ class _LoginScreenState extends State<SignInScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20.h),
-
-                /// Language Toggle (Simplified Placeholder for the UI at the bottom)
-                Container(
-                  padding: EdgeInsets.all(4.r),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.bluePrimaryColor),
-                    borderRadius: BorderRadius.circular(25.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircleAvatar(radius: 15.r, child: const Text("🇺🇸")),
-                      SizedBox(width: 8.w),
-                      CircleAvatar(radius: 15.r, child: const Text("🇪🇬")),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -221,58 +192,84 @@ class _LoginScreenState extends State<SignInScreen> {
   }
 
   void login() async {
-    //todo:show loading
-    CustomAlertDialog.showLoading(context: context, loadingText: 'loading...');
-    try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      //todo:hide loading
-      CustomAlertDialog.hideLoading(context);
-      //todo:show message
-      CustomAlertDialog.showMessage(
+    if (formKey.currentState!.validate()) {
+      CustomAlertDialog.showLoading(
         context: context,
-        message: 'Login Success',
-        title: 'Success',
-        postActionName: 'ok',
-        onPostActionPressed: () {
-          Navigator.pushNamed(context, AppRoutes.homeRoute);
-        },
+        loadingText: 'loading...',
       );
-      print("sign in succeed");
-      print("id: ${credential.user!.uid}");
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-credential') {
-        //todo:hide loading
-        CustomAlertDialog.hideLoading(context);
-        //todo:show Message
-        CustomAlertDialog.showMessage(
-          context: context,
-          message: 'invalid email or password',
+      try {
+        await FirebaseAuthUtils.login(
+          email: emailController.text,
+          password: passwordController.text,
         );
-      } else if (e.code == 'network-request-failed') {
-        //todo:hide loading
         CustomAlertDialog.hideLoading(context);
-        //todo:show Message
         CustomAlertDialog.showMessage(
           context: context,
-          message: 'Network request failed.',
-          title: 'Error',
+          message: 'Login Success',
+          title: 'Success',
           postActionName: 'ok',
+          onPostActionPressed: () =>
+              Navigator.pushReplacementNamed(context, AppRoutes.homeRoute),
+        );
+      } on FirebaseAuthException catch (e) {
+        CustomAlertDialog.hideLoading(context);
+        String errorMsg = "An error occurred";
+        if (e.code == 'invalid-credential')
+          errorMsg = 'Invalid email or password';
+        if (e.code == 'network-request-failed')
+          errorMsg = 'Network request failed.';
+
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: errorMsg,
+          title: 'Error',
+        );
+      } catch (e) {
+        CustomAlertDialog.hideLoading(context);
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: e.toString(),
+          title: 'Error',
         );
       }
-    } catch (e) {
-      //todo:hide loading
+    }
+  }
+
+  void loginWithGoogle() async {
+    CustomAlertDialog.showLoading(context: context, loadingText: 'loading...');
+
+    try {
+      final userCredential = await FirebaseAuthUtils.signInWithGoogle();
+
       CustomAlertDialog.hideLoading(context);
-      //todo:show Message
+
+      if (userCredential != null) {
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: 'Login Success',
+          title: 'Success',
+          postActionName: 'ok',
+          onPostActionPressed: () =>
+              Navigator.pushReplacementNamed(context, AppRoutes.homeRoute),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      CustomAlertDialog.hideLoading(context);
       CustomAlertDialog.showMessage(
         context: context,
-        message: '${e.toString()}',
+        message: e.message ?? "An error occurred during Google Sign-In",
         title: 'Error',
-        postActionName: 'ok',
       );
-      print(e.toString());
+    } catch (e) {
+      CustomAlertDialog.hideLoading(context);
+      // Handle user cancelling the picker (e will be null or specific error)
+      if (e.toString() != "null") {
+        CustomAlertDialog.showMessage(
+          context: context,
+          message: e.toString(),
+          title: 'Error',
+        );
+      }
     }
   }
 }
