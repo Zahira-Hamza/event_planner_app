@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/Firebase-Firestore/firebase_auth_utils.dart';
 import '../../../../core/Firebase-Firestore/firebase_utils.dart';
 import '../../../../core/Firebase-Firestore/models/event.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -106,7 +107,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Image.asset(
-                    eventsImage[selectedIndex],
+                    AppAssets.getEventImage(
+                      context,
+                      eventsImage[selectedIndex],
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -292,10 +296,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  void addEvent() {
+  void addEvent() async {
     if (appProvider.eventLocation == null) {
       ToastUtils.showToast(message: "Please select event location".tr());
+      return;
     }
+
     if (formKey.currentState?.validate() == true) {
       if (selectedDate == null || selectedTime == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -303,7 +309,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         );
         return;
       }
-      //todo:add event to db
+
+      // 1. Get current logged-in user ID
+      String currentUserId = FirebaseAuthUtils.getCurrentUser()?.uid ?? "";
+
+      // 2. Create event with the userId
       Event event = Event(
         image: selectedImage!,
         title: titleController.text,
@@ -313,15 +323,22 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         time: formattedTime,
         lat: appProvider.eventLocation?.latitude ?? 0,
         long: appProvider.eventLocation?.longitude ?? 0,
+        userId: currentUserId, // Implementation: Add the UID here
       );
-      FirebaseUtils.addEventToFireStore(event).timeout(
-        Duration(milliseconds: 500),
-        onTimeout: () {
-          //todo: Logic for adding event locally or just navigating back
-          ToastUtils.showToast(message: "Event Added Successfully".tr());
+
+      try {
+        // 3. Wait for Firestore to finish (removed the 500ms timeout)
+        await FirebaseUtils.addEventToFireStore(event);
+
+        ToastUtils.showToast(message: "Event Added Successfully".tr());
+        if (mounted) {
           Navigator.of(context).pop();
-        },
-      );
+        }
+      } catch (e) {
+        // This will now show you more specific error details if permission fails
+        debugPrint("Firestore Error: $e");
+        ToastUtils.showToast(message: "Error: $e");
+      }
     }
   }
 }

@@ -1,12 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_planner_app/view/Home/Home_Tab/widgets/event_item.dart';
+import 'package:event_planner_app/view/Home/Profile_Tab/widgets/language_bottom_sheet.dart';
+import 'package:event_planner_app/view/Home/Profile_Tab/widgets/theme_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../view_model/providers/Language_Provider/app_language_provider.dart';
 import '../../../view_model/providers/event_list_provider.dart';
+import '../../../view_model/providers/user_provider.dart';
 import 'widgets/event_category_tab_item.dart';
 
 class HomeTab extends StatefulWidget {
@@ -20,19 +24,23 @@ class _HomeTabScreenState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
-    // Start listening to Firebase when the screen opens
-    Provider.of<EventListProvider>(context, listen: false).listenToEvents();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<UserProvider>(context, listen: false).fetchCurrentUser();
+      Provider.of<EventListProvider>(context, listen: false).listenToEvents();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Watch the provider for changes
     var provider = Provider.of<EventListProvider>(context);
+    var userProvider = Provider.of<UserProvider>(context);
+    final photoUrl = userProvider.currentUser?.photoUrl;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.bluePrimaryColor,
         automaticallyImplyLeading: false,
-        toolbarHeight: 100.h, // Using fixed height via ScreenUtil
+        toolbarHeight: 100.h,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(25.r),
@@ -41,38 +49,80 @@ class _HomeTabScreenState extends State<HomeTab> {
         ),
         title: Row(
           children: [
+            // ── Profile avatar ──────────────────────────────────────────
+            CircleAvatar(
+              radius: 22.r,
+              backgroundColor: Colors.white,
+              backgroundImage: photoUrl != null
+                  ? NetworkImage(photoUrl)
+                  : const AssetImage('assets/images/profile.png')
+                        as ImageProvider,
+            ),
+            SizedBox(width: 12.w),
+
+            // ── Welcome + name ──────────────────────────────────────────
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text("Welcome Back ✨".tr(), style: AppStyles.medium16white),
+                SizedBox(height: 2.h),
                 Text(
-                  "Welcome Back ✨".tr(),
-                  style: AppStyles.medium16white.copyWith(fontSize: 14.sp),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  "John Safwat",
-                  style: AppStyles.bold20white.copyWith(fontSize: 24.sp),
+                  userProvider.currentUser?.name ?? "User",
+                  style: AppStyles.bold20white.copyWith(fontSize: 20.sp),
                 ),
               ],
             ),
             const Spacer(),
-            const ImageIcon(
-              AssetImage("assets/images/theme_icon.png"),
-              color: Colors.white,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.w),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.r),
+
+            // ── Theme toggle icon ───────────────────────────────────────
+            GestureDetector(
+              onTap: () => showModalBottomSheet(
+                context: context,
+                backgroundColor: Theme.of(context).cardColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20.r),
+                  ),
                 ),
-                child: Text(
-                  "EN",
-                  style: AppStyles.bold20white.copyWith(
-                    fontSize: 14.sp,
-                    color: AppColors.bluePrimaryColor,
+                builder: (_) => const ThemeBottomSheet(),
+              ),
+              child: const ImageIcon(
+                AssetImage("assets/images/theme_icon.png"),
+                color: Colors.white,
+              ),
+            ),
+
+            // ── Language badge ──────────────────────────────────────────
+            Padding(
+              padding: EdgeInsets.only(left: 8.w),
+              child: GestureDetector(
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Theme.of(context).cardColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20.r),
+                    ),
+                  ),
+                  builder: (_) => const LanguageBottomSheet(),
+                ),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Consumer<AppLanguageProvider>(
+                    builder: (_, langProvider, __) => Text(
+                      langProvider.appLanguage == 'ar' ? 'AR' : 'EN',
+                      style: AppStyles.bold20white.copyWith(
+                        fontSize: 14.sp,
+                        color: AppColors.bluePrimaryColor,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -80,7 +130,7 @@ class _HomeTabScreenState extends State<HomeTab> {
           ],
         ),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(100.h),
+          preferredSize: Size.fromHeight(90.h),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             child: Column(
@@ -88,7 +138,11 @@ class _HomeTabScreenState extends State<HomeTab> {
                 Row(
                   children: [
                     const Icon(Icons.location_on_outlined, color: Colors.white),
-                    Text("Cairo , Egypt".tr(), style: AppStyles.medium16white),
+                    SizedBox(width: 4.w),
+                    Text(
+                      userProvider.currentUser?.location ?? "Loading...",
+                      style: AppStyles.medium16white,
+                    ),
                   ],
                 ),
                 SizedBox(height: 12.h),
@@ -100,19 +154,15 @@ class _HomeTabScreenState extends State<HomeTab> {
                     labelPadding: EdgeInsets.zero,
                     tabAlignment: TabAlignment.start,
                     onTap: (index) {
-                      setState(() {
-                        provider.changeSelectedIndex(index);
-                      });
+                      setState(() => provider.changeSelectedIndex(index));
                     },
                     isScrollable: true,
                     tabs: provider.eventsName.asMap().entries.map((entry) {
                       return EventCategoryTabItem(
-                        selectedTextStyle: Theme.of(
-                          context,
-                        ).textTheme.headlineMedium!,
-                        unselectedTextStyle: Theme.of(
-                          context,
-                        ).textTheme.headlineSmall!,
+                        // Selected: white pill → blue text so it's readable
+                        // Unselected: transparent → white text on blue AppBar
+                        selectedTextStyle: AppStyles.medium16blue,
+                        unselectedTextStyle: AppStyles.medium16white,
                         isSelected: provider.selectedIndex == entry.key,
                         event: entry.value,
                         selectedBgColor: Colors.white,
@@ -136,18 +186,4 @@ class _HomeTabScreenState extends State<HomeTab> {
             ),
     );
   }
-
-  //* void getAllEvents() async {
-  //   QuerySnapshot<Event> querySnapshot =
-  //       await FirebaseUtils.getEventsCollection()
-  //           .get(); //* one time read=>real time read
-  //   setState(() {
-  //     eventsList = querySnapshot.docs.map((doc) => doc.data()).toList();
-  //   });
-  // }
 }
-
-//* Feature:  get() + setState()    =>     snapshots() + StreamBuilder(*Remove the eventsList variable and the getAllEvents call from build and This handles the "snapshots" and the "rebuilds" automatically)
-// Data Type: Future (One-time fetch)     Stream (Real-time updates)
-// UI Updates:Manual (must call setState)  Automatic (built into the widget)
-// Complexity:Higher (handling lifecycles)   Lower (cleaner code)

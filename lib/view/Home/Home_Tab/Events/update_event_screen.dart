@@ -184,10 +184,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   }
 
   void updateEventLogic() async {
-    print("Update Button Pressed");
-
     if (formKey.currentState?.validate() == true) {
-      // 1. Create the updated event object
       Event updatedEvent = Event(
         id: event.id,
         image: event.image,
@@ -199,37 +196,25 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
         lat: event.lat,
         long: event.long,
         isFavorite: event.isFavorite,
+        userId: event.userId, // Keep the same userId
       );
 
       try {
-        print("Starting Firestore Update for ID: ${event.id}");
-
-        // 2. Perform the Update with a timeout to prevent hanging
+        // Removed the timeout to ensure the network has time to respond
         await FirebaseUtils.getEventsCollection()
             .doc(event.id)
-            .update(updatedEvent.toJson())
-            .timeout(const Duration(seconds: 5));
+            .update(updatedEvent.toJson());
 
-        print("Update Successful in Firestore");
-
-        // 3. Show Toast
         ToastUtils.showToast(message: "Event Updated Successfully".tr());
 
-        // 4. Navigate to Home
-        // If AppRoutes.homeRoute fails, this will catch it
         if (mounted) {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.homeRoute,
-            (route) => false,
-          );
+          // Navigating back to the previous screen (likely the event details)
+          Navigator.pushNamed(context, AppRoutes.homeRoute);
         }
       } catch (error) {
-        print("Detailed Error: $error");
+        debugPrint("Update Error: $error");
         ToastUtils.showToast(message: "Update Failed".tr());
       }
-    } else {
-      print("Form Validation Failed");
     }
   }
 }

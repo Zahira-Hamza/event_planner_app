@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/utils/app_colors.dart';
-import '../../../../core/utils/app_styles.dart';
 import '../../../../view_model/providers/Theme_Provider/app_theme_provider.dart';
 
 class ThemeBottomSheet extends StatelessWidget {
@@ -61,7 +60,10 @@ class ThemeBottomSheet extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: isSelected ? AppStyles.medium16blue : AppStyles.medium16black,
+        style: TextStyle(
+          color: isSelected ? AppColors.bluePrimaryColor : Colors.grey,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
       ),
       trailing: isSelected
           ? Icon(Icons.check_circle, color: AppColors.bluePrimaryColor)

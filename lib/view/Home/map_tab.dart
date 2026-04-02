@@ -13,14 +13,11 @@ class MapTab extends StatefulWidget {
 }
 
 class _MapTabState extends State<MapTab> {
-  late AppProvider provider;
   @override
   void initState() {
     super.initState();
-    // Use addPostFrameCallback to ensure context is ready
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      var provider = Provider.of<AppProvider>(context, listen: false);
-      provider.getLocation();
+      Provider.of<AppProvider>(context, listen: false).getLocation();
     });
   }
 
@@ -30,7 +27,7 @@ class _MapTabState extends State<MapTab> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          provider.getLocation();
+          Provider.of<AppProvider>(context, listen: false).getLocation();
         },
         backgroundColor: AppColors.bluePrimaryColor,
         child: Icon(Icons.gps_fixed, color: Colors.white),

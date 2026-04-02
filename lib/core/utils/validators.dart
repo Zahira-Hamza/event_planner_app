@@ -1,14 +1,11 @@
 class Validators {
   Validators._();
 
-  ///private constructor to prevent instantiation
   static String? validateEmail(String? val) {
     final RegExp emailRegex = RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
     );
-    if (val == null) {
-      return 'This field is required';
-    } else if (val.trim().isEmpty) {
+    if (val == null || val.trim().isEmpty) {
       return 'This field is required';
     } else if (emailRegex.hasMatch(val) == false) {
       return 'Enter valid email';
@@ -21,7 +18,7 @@ class Validators {
     if (val == null || val.isEmpty) {
       return 'This field is required';
     } else if (val.length < 8) {
-      return 'Strong password required';
+      return 'Strong password required (min 8 characters)';
     } else {
       return null;
     }
@@ -31,10 +28,18 @@ class Validators {
     if (val == null || val.isEmpty) {
       return 'This field is required';
     } else if (val != password) {
-      return 'Not the Same password';
+      return 'Passwords do not match';
     } else {
       return null;
     }
+  }
+
+  // FIXED: Added this method to handle general fields like Name and Location
+  static String? validateField(String? val, String fieldName) {
+    if (val == null || val.trim().isEmpty) {
+      return '$fieldName is required';
+    }
+    return null;
   }
 
   static String? validateUsername(String? val) {
@@ -51,19 +56,6 @@ class Validators {
   static String? validateFullName(String? val) {
     if (val == null || val.isEmpty) {
       return 'This field is required';
-    } else {
-      return null;
-    }
-  }
-
-  static String? validatePhoneNumber(String? val) {
-    if (val == null) {
-      return 'This field is required';
-    } else if (int.tryParse(val.trim()) == null) {
-      //check if val is a number not string
-      return 'Enter numbers only';
-    } else if (val.trim().length != 11) {
-      return 'Enter value must equal 11 digit';
     } else {
       return null;
     }

@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/Firebase-Firestore/firebase_auth_utils.dart';
 import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/app_styles.dart';
 import '../../../view_model/providers/Language_Provider/app_language_provider.dart';
 import '../../../view_model/providers/Theme_Provider/app_theme_provider.dart';
+import '../../../view_model/providers/user_provider.dart';
 
 class ProfileTabScreen extends StatefulWidget {
   const ProfileTabScreen({super.key});
@@ -26,7 +29,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       body: Column(
         children: [
           _buildHeader(),
-
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -34,8 +36,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 24.h),
-
-                  // Language Selection
                   Text(
                     "language".tr(),
                     style: Theme.of(context).textTheme.headlineLarge,
@@ -45,9 +45,13 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                     readOnly: true,
                     onTap: () => showModalBottomSheet(
                       context: context,
-                      builder: (BuildContext context) {
-                        return const LanguageBottomSheet();
-                      },
+                      backgroundColor: Theme.of(context).cardColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20.r),
+                        ),
+                      ),
+                      builder: (_) => const LanguageBottomSheet(),
                     ),
                     decoration: _getInputDecoration(
                       hint: languageProvider.appLanguage == 'ar'
@@ -55,10 +59,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                           : 'English'.tr(),
                     ),
                   ),
-
                   SizedBox(height: 24.h),
-
-                  // Theme Selection
                   Text(
                     "theme".tr(),
                     style: Theme.of(context).textTheme.headlineLarge,
@@ -68,18 +69,19 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                     readOnly: true,
                     onTap: () => showModalBottomSheet(
                       context: context,
-                      builder: (BuildContext context) {
-                        return const ThemeBottomSheet();
-                      },
+                      backgroundColor: Theme.of(context).cardColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20.r),
+                        ),
+                      ),
+                      builder: (_) => const ThemeBottomSheet(),
                     ),
                     decoration: _getInputDecoration(
                       hint: themeProvider.isDark ? "Dark".tr() : "Light".tr(),
                     ),
                   ),
-
                   const Spacer(),
-
-                  // Logout Button
                   _buildLogoutButton(),
                   SizedBox(height: 40.h),
                 ],
@@ -92,83 +94,96 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   }
 
   Widget _buildHeader() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.only(
-        top: 60.h,
-        bottom: 30.h,
-        left: 20.w,
-        right: 20.w,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.bluePrimaryColor,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30.r),
-          bottomRight: Radius.circular(30.r),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Profile Image / Logo
-          Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: CircleAvatar(
-              radius: 35.r,
-              backgroundColor: Colors.white,
-              backgroundImage: const AssetImage(
-                'assets/images/profile.png',
-              ), // Add your logo path
-            ),
-          ),
-          SizedBox(width: 16.w),
-          // User Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("John Safwat", style: AppStyles.bold20white),
-                Text(
-                  "johnsafwat.route@gmail.com",
-                  style: AppStyles.medium16white.copyWith(fontSize: 14.sp),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, _) {
+        final photoUrl = userProvider.currentUser?.photoUrl;
+        final isUploading = userProvider.isUploadingPhoto;
 
-  Widget _buildDropdown({
-    required String value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.bluePrimaryColor),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          icon: Icon(Icons.arrow_drop_down, color: AppColors.bluePrimaryColor),
-          items: items.map((String item) {
-            return DropdownMenuItem(
-              value: item,
-              child: Text(item, style: AppStyles.medium16blue),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
-      ),
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.only(
+            top: 60.h,
+            bottom: 30.h,
+            left: 20.w,
+            right: 20.w,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.bluePrimaryColor,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.r),
+              bottomRight: Radius.circular(30.r),
+            ),
+          ),
+          child: Row(
+            children: [
+              // Tappable profile avatar
+              GestureDetector(
+                onTap: isUploading
+                    ? null
+                    : () => userProvider.pickAndUploadPhoto(),
+                child: Stack(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(3.w),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: CircleAvatar(
+                        radius: 35.r,
+                        backgroundColor: Colors.white,
+                        backgroundImage: photoUrl != null
+                            ? NetworkImage(photoUrl)
+                            : const AssetImage('assets/images/profile.png')
+                                  as ImageProvider,
+                        child: isUploading
+                            ? const CircularProgressIndicator(
+                                color: AppColors.bluePrimaryColor,
+                              )
+                            : null,
+                      ),
+                    ),
+                    // Camera badge
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        padding: EdgeInsets.all(4.r),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.camera_alt,
+                          size: 14.r,
+                          color: AppColors.bluePrimaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userProvider.currentUser?.name ?? "User",
+                      style: AppStyles.bold20white,
+                    ),
+                    Text(
+                      userProvider.currentUser?.email ?? "",
+                      style: AppStyles.medium16white.copyWith(fontSize: 14.sp),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -177,13 +192,20 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       width: double.infinity,
       height: 55.h,
       child: ElevatedButton.icon(
-        onPressed: () {
-          // Logout Logic
+        onPressed: () async {
+          await FirebaseAuthUtils.logout();
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.signInRoute,
+              (route) => false,
+            );
+          }
         },
         icon: const Icon(Icons.logout, color: Colors.white),
         label: Text("Logout".tr(), style: AppStyles.medium16white),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFF5252), // Professional red
+          backgroundColor: const Color(0xFFFF5252),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
           ),
@@ -192,7 +214,6 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     );
   }
 
-  // Helper for consistent TextField Styling
   InputDecoration _getInputDecoration({required String hint}) {
     return InputDecoration(
       hintText: hint,

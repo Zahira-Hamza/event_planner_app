@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/Firebase-Firestore/firebase_auth_utils.dart';
+import '../../core/Firebase-Firestore/firebase_utils.dart';
+import '../../core/Firebase-Firestore/models/user_model.dart';
 import '../../core/utils/app_assets.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_routes.dart';
@@ -26,6 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController rePasswordController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
 
   bool _isPasswordHidden = true;
   bool _isRePasswordHidden = true;
@@ -74,7 +77,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           color: Colors.grey,
                           size: 22.sp,
                         ),
-                        validator: Validators.validateFullName,
+                        validator: Validators.validateUsername,
                       ),
                       SizedBox(height: 16.h),
                       CustomTextFormField(
@@ -86,6 +89,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           size: 22.sp,
                         ),
                         validator: Validators.validateEmail,
+                      ),
+                      SizedBox(height: 16.h),
+                      CustomTextFormField(
+                        hintText: 'Location'.tr(),
+                        prefixIcon: const Icon(
+                          Icons.location_on,
+                          color: Colors.grey,
+                        ),
+                        validator: (value) =>
+                            Validators.validateField(value, 'Location'),
+                        textEditingController: locationController,
                       ),
                       SizedBox(height: 16.h),
                       CustomTextFormField(
@@ -195,32 +209,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
         loadingText: 'loading...',
       );
       try {
-        await FirebaseAuthUtils.signUp(
+        // 1. Create Auth Account
+        UserCredential userCredential = await FirebaseAuthUtils.signUp(
           email: emailController.text,
           password: passwordController.text,
         );
-        CustomAlertDialog.hideLoading(context);
-        CustomAlertDialog.showMessage(
-          context: context,
-          message: 'Register Success',
-          title: 'Success',
-          postActionName: 'ok',
-          onPostActionPressed: () =>
-              Navigator.pushReplacementNamed(context, AppRoutes.signInRoute),
+
+        // 2. Create User Model
+        UserModel newUser = UserModel(
+          id: userCredential.user!.uid,
+          name: nameController.text,
+          email: emailController.text,
+          location: locationController.text, // From the new field
         );
+
+        // 3. Save to Firestore
+        await FirebaseUtils.addUserToFireStore(newUser);
+
+        CustomAlertDialog.hideLoading(context);
+        Navigator.pushReplacementNamed(context, AppRoutes.signInRoute);
       } on FirebaseAuthException catch (e) {
         CustomAlertDialog.hideLoading(context);
-        String errorMsg = 'An error occurred';
-        if (e.code == 'weak-password')
-          errorMsg = 'The password provided is too weak.';
-        if (e.code == 'email-already-in-use')
-          errorMsg = 'The account already exists for that email.';
-        if (e.code == 'network-request-failed')
-          errorMsg = 'Network request failed.';
-
         CustomAlertDialog.showMessage(
           context: context,
-          message: errorMsg,
+          message: e.message ?? "Error",
           title: 'Error',
         );
       } catch (e) {

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_planner_app/view/Home/Home_Tab/Events/create_event_screen.dart';
 import 'package:event_planner_app/view/Home/Home_Tab/Events/update_event_screen.dart';
@@ -12,10 +11,11 @@ import 'package:event_planner_app/view_model/providers/Language_Provider/app_lan
 import 'package:event_planner_app/view_model/providers/Theme_Provider/app_theme_provider.dart';
 import 'package:event_planner_app/view_model/providers/app_provider.dart';
 import 'package:event_planner_app/view_model/providers/event_list_provider.dart';
+import 'package:event_planner_app/view_model/providers/user_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Add this
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import 'core/utils/app_routes.dart';
@@ -27,8 +27,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await EasyLocalization.ensureInitialized();
-  //* caching on the phone not using the network
-  await FirebaseFirestore.instance.disableNetwork();
+
+  // Network is enabled by default. Removed disableNetwork() to ensure data syncs to Firebase.
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],
@@ -40,6 +41,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => AppThemeProvider()),
           ChangeNotifierProvider(create: (_) => EventListProvider()),
           ChangeNotifierProvider(create: (_) => AppProvider()),
+          ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
         child: const MyApp(),
       ),
@@ -53,8 +55,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var themeProvider = Provider.of<AppThemeProvider>(context);
-    var languageProvider = Provider.of<AppLanguageProvider>(context);
-    //* Initialize ScreenUtil *//
     return ScreenUtilInit(
       designSize: const Size(393, 841),
       minTextAdapt: true,
@@ -62,17 +62,13 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          //*localization*//
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
-          // Use context.locale (from Easy Localization)
           locale: context.locale,
-          //* Theming *//
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.getAppTheme,
-          //* Routes *//
-          initialRoute: AppRoutes.homeRoute,
+          initialRoute: AppRoutes.signInRoute,
           routes: {
             AppRoutes.signInRoute: (context) => const SignInScreen(),
             AppRoutes.signUpRoute: (context) => const SignUpScreen(),

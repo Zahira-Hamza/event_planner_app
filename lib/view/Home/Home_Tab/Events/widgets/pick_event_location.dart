@@ -76,10 +76,10 @@ class _PickEventLocationState extends State<PickEventLocation> {
                   ),
                 ),
                 child: const Text(
-                  "Tap on Location To Select",
+                  "Tap on map to select location",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

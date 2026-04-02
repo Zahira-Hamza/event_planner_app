@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -58,7 +59,7 @@ class FirebaseAuthUtils {
       // 5. Once signed in, return the UserCredential
       return await FirebaseAuth.instance.signInWithCredential(credentials);
     } catch (e) {
-      print('Google sign-in error $e');
+      debugPrint('Google sign-in error $e');
       return null;
     }
   }

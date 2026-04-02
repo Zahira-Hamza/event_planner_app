@@ -1,61 +1,59 @@
 class Event {
-  //data class-model
-  static const String collectionName = 'Events';
+  static const String collectionName = "Events";
   String id;
-  String image;
   String title;
   String description;
+  String image;
   String eventName;
   DateTime dateTime;
   String time;
   bool isFavorite;
   double lat;
   double long;
+  String userId; // Added userId field
 
   Event({
-    this.id = "",
-    required this.image,
+    this.id = '',
     required this.title,
     required this.description,
+    required this.image,
     required this.eventName,
     required this.dateTime,
     required this.time,
     this.isFavorite = false,
-    this.lat = 0,
-    this.long = 0,
+    required this.lat,
+    required this.long,
+    required this.userId, // Added to constructor
   });
 
-  //todo:json=>object   ///from fireStore(الداتا اللى جايالى)
-  Event.fromJson(Map<String, dynamic> jsonData)
+  Event.fromJson(Map<String, dynamic> json)
     : this(
-        id: jsonData['id'],
-        image: jsonData['image'],
-        title: jsonData['title'],
-        description: jsonData['description'],
-        eventName: jsonData['eventName'],
-        dateTime: DateTime.fromMillisecondsSinceEpoch(jsonData['dateTime']),
-        time: jsonData['time'],
-        isFavorite: jsonData['isFavorite'],
-        lat: jsonData['lat'] ?? 0,
-        long: jsonData['long'] ?? 0,
+        id: json['id'],
+        title: json['title'],
+        description: json['description'],
+        image: json['image'],
+        eventName: json['eventName'],
+        dateTime: DateTime.fromMillisecondsSinceEpoch(json['dateTime']),
+        time: json['time'],
+        isFavorite: json['isFavorite'] ?? false,
+        lat: json['lat'],
+        long: json['long'],
+        userId: json['userId'] ?? '', // Added to fromJson
       );
 
-  //todo:object=>json
   Map<String, dynamic> toJson() {
-    ///to fireStore
     return {
-      'id': id,
-      'image': image,
-      'title': title,
-      'description': description,
-      'eventName': eventName,
-      'dateTime': dateTime.millisecondsSinceEpoch,
-
-      ///string(object of dateTime)->int to do any operation on the time
-      'time': time,
-      'isFavorite': isFavorite,
-      'lat': lat,
-      'long': long,
+      "id": id,
+      "title": title,
+      "description": description,
+      "image": image,
+      "eventName": eventName,
+      "dateTime": dateTime.millisecondsSinceEpoch,
+      "time": time,
+      "isFavorite": isFavorite,
+      "lat": lat,
+      "long": long,
+      "userId": userId, // Added to toJson
     };
   }
 }

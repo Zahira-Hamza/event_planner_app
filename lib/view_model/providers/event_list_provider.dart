@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:event_planner_app/core/Firebase-Firestore/firebase_auth_utils.dart'; // Add this import
 import 'package:flutter/material.dart';
 
 import '../../core/Firebase-Firestore/firebase_utils.dart';
 import '../../core/Firebase-Firestore/models/event.dart';
 
 class EventListProvider extends ChangeNotifier {
-  List<Event> eventsList = []; // Private full list
+  List<Event> eventsList = [];
   List<Event> filterEventsList = [];
   int selectedIndex = 0;
   String _searchQuery = "";
@@ -23,12 +24,17 @@ class EventListProvider extends ChangeNotifier {
     'Eating'.tr(),
   ];
 
-  // Initialize the stream listener
   void listenToEvents() {
-    FirebaseUtils.getEventsCollection().snapshots().listen((querySnapshot) {
-      eventsList = querySnapshot.docs.map((doc) => doc.data()).toList();
-      _applyFilter(); // Re-filter whenever data changes
-    });
+    String? uid = FirebaseAuthUtils.getCurrentUser()?.uid;
+
+    // Added .where to filter events belonging only to the current user
+    FirebaseUtils.getEventsCollection()
+        .where('userId', isEqualTo: uid)
+        .snapshots()
+        .listen((querySnapshot) {
+          eventsList = querySnapshot.docs.map((doc) => doc.data()).toList();
+          _applyFilter();
+        });
   }
 
   void changeSelectedIndex(int newIndex) {
@@ -38,13 +44,12 @@ class EventListProvider extends ChangeNotifier {
 
   void _applyFilter() {
     if (selectedIndex == 0) {
-      filterEventsList = eventsList;
+      filterEventsList = List.from(eventsList);
     } else {
       filterEventsList = eventsList
           .where((event) => event.eventName == eventsName[selectedIndex])
           .toList();
     }
-    // Sort by date
     filterEventsList.sort((a, b) => a.dateTime.compareTo(b.dateTime));
     notifyListeners();
   }
@@ -67,7 +72,6 @@ class EventListProvider extends ChangeNotifier {
     }).toList()..sort((a, b) => a.dateTime.compareTo(b.dateTime));
   }
 
-  //* Add a setter to update search and notify listeners
   void updateSearchQuery(String query) {
     _searchQuery = query;
     notifyListeners();

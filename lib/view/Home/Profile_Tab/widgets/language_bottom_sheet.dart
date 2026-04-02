@@ -71,7 +71,7 @@ class LanguageOption extends StatelessWidget {
       title: Text(
         title,
         style: TextStyle(
-          color: isSelected ? Colors.blue : Colors.black,
+          color: isSelected ? AppColors.bluePrimaryColor : Colors.grey,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
