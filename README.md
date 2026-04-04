@@ -247,15 +247,15 @@ Events/
 
 | Sign In — Light | Sign In — Dark |
 |---|---|
-| ![](screenshots/sign_in_light.png) | ![](screenshots/sign_in_dark.png) |
+| ![](screenshots/sign_in_light.jpeg) | ![](screenshots/sign_in_dark.jpeg) |
 
 | Sign Up — Light | Sign Up — Dark |
 |---|---|
-| ![](screenshots/sign_up_light.png) | ![](screenshots/sign_up_dark.png) |
+| ![](screenshots/sign_up_light.jpeg) | ![](screenshots/sign_up_dark.jpeg) |
 
 | Forget Password — Light | Forget Password — Dark |
 |---|---|
-| ![](screenshots/forget_password_light.png) | ![](screenshots/forget_password_dark.png) |
+| ![](screenshots/forget_password_light.jpeg) | ![](screenshots/forget_password_dark.jpeg) |
 
 ---
 
@@ -263,7 +263,7 @@ Events/
 
 | Home — Light | Home — Dark |
 |---|---|
-| ![](screenshots/home_light.png) | ![](screenshots/home_dark.png) |
+| ![](screenshots/home_light.jpeg) | ![](screenshots/home_dark.jpeg) |
 
 ---
 
@@ -271,15 +271,15 @@ Events/
 
 | Create Event — Light | Create Event — Dark |
 |---|---|
-| ![](screenshots/create_event_light.png) | ![](screenshots/create_event_dark.png) |
+| ![](screenshots/create_event_light.jpeg) | ![](screenshots/create_event_dark.jpeg) |
 
 | Event Details — Light | Event Details — Dark |
 |---|---|
-| ![](screenshots/event_details_light.png) | ![](screenshots/event_details_dark.png) |
+| ![](screenshots/event_details_light.jpeg) | ![](screenshots/event_details_dark.jpeg) |
 
 | Update Event — Light | Update Event — Dark |
 |---|---|
-| ![](screenshots/update_event_light.png) | ![](screenshots/update_event_dark.png) |
+| ![](screenshots/update_event_light.jpeg) | ![](screenshots/update_event_dark.jpeg) |
 
 ---
 
@@ -287,7 +287,7 @@ Events/
 
 | Favourites — Light | Favourites — Dark |
 |---|---|
-| ![](screenshots/favourites_light.png) | ![](screenshots/favourites_dark.png) |
+| ![](screenshots/favourites_light.jpeg) | ![](screenshots/favourites_dark.jpeg) |
 
 ---
 
@@ -295,7 +295,7 @@ Events/
 
 | Map — Light | Map — Dark |
 |---|---|
-| ![](screenshots/map_light.png) | ![](screenshots/map_dark.png) |
+| ![](screenshots/map_light.jpeg) | ![](screenshots/map_dark.jpeg) |
 
 ---
 
@@ -303,7 +303,7 @@ Events/
 
 | Profile — Light | Profile — Dark |
 |---|---|
-| ![](screenshots/profile_light.png) | ![](screenshots/profile_dark.png) |
+| ![](screenshots/profile_light.jpeg) | ![](screenshots/profile_dark.jpeg) |
 
 ---
 
