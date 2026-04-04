@@ -46,9 +46,11 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIStatusBarHidden</key>
-		<false/>
+		<true/>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
+		<false/>
 	</dict>
 </plist>

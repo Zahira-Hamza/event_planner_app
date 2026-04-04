@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/utils/app_colors.dart';
@@ -10,34 +11,47 @@ class LanguageBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var languageProvider = Provider.of<AppLanguageProvider>(context);
-    String currentLanguage = languageProvider.appLanguage;
+    final languageProvider = Provider.of<AppLanguageProvider>(context);
+    final current = languageProvider.appLanguage;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 32.h),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          LanguageOption(
+          // Handle bar
+          Container(
+            width: 40.w,
+            height: 4.h,
+            margin: EdgeInsets.only(bottom: 20.h),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade400,
+              borderRadius: BorderRadius.circular(2.r),
+            ),
+          ),
+          _LanguageOption(
             title: tr('english'),
-            isSelected: currentLanguage == 'en',
-
-            onTap: () {
-              //! this line is not useful?
-              context.setLocale(const Locale('en'));
-              languageProvider.changeLanguage('en');
-              Navigator.pop(context);
+            subtitle: 'English',
+            isSelected: current == 'en',
+            onTap: () async {
+              await languageProvider.changeLanguage('en');
+              if (context.mounted) {
+                context.setLocale(const Locale('en'));
+                Navigator.pop(context);
+              }
             },
           ),
-          const SizedBox(height: 8),
-          LanguageOption(
+          SizedBox(height: 12.h),
+          _LanguageOption(
             title: tr('arabic'),
-            isSelected: currentLanguage == 'ar',
-            onTap: () {
-              //! this line is not useful?
-              context.setLocale(const Locale('ar'));
-              languageProvider.changeLanguage('ar');
-              Navigator.pop(context);
+            subtitle: 'العربية',
+            isSelected: current == 'ar',
+            onTap: () async {
+              await languageProvider.changeLanguage('ar');
+              if (context.mounted) {
+                context.setLocale(const Locale('ar'));
+                Navigator.pop(context);
+              }
             },
           ),
         ],
@@ -46,34 +60,44 @@ class LanguageBottomSheet extends StatelessWidget {
   }
 }
 
-class LanguageOption extends StatelessWidget {
+class _LanguageOption extends StatelessWidget {
   final String title;
+  final String subtitle;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const LanguageOption({
-    super.key,
+  const _LanguageOption({
     required this.title,
+    required this.subtitle,
     required this.isSelected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final textColor = isSelected
+        ? AppColors.bluePrimaryColor
+        : Theme.of(context).textTheme.bodyMedium?.color;
+
     return ListTile(
       onTap: onTap,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         side: BorderSide(
-          color: isSelected ? AppColors.bluePrimaryColor : Colors.grey,
+          color: isSelected ? AppColors.bluePrimaryColor : Colors.grey.shade400,
         ),
       ),
       title: Text(
         title,
         style: TextStyle(
-          color: isSelected ? AppColors.bluePrimaryColor : Colors.grey,
+          color: textColor,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          fontSize: 16.sp,
         ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(color: textColor?.withOpacity(0.6), fontSize: 13.sp),
       ),
       trailing: isSelected
           ? Icon(Icons.check_circle, color: AppColors.bluePrimaryColor)

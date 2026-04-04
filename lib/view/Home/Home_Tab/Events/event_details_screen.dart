@@ -3,6 +3,7 @@ import 'package:event_planner_app/view/Home/Home_Tab/Events/widgets/event_locati
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/Firebase-Firestore/firebase_utils.dart';
 import '../../../../core/Firebase-Firestore/models/event.dart';
@@ -10,6 +11,7 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/app_styles.dart';
+import '../../../../view_model/providers/Theme_Provider/app_theme_provider.dart';
 
 class EventDetailsScreen extends StatelessWidget {
   const EventDetailsScreen({super.key});
@@ -51,14 +53,18 @@ class EventDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Event Image — switches with theme
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20.r),
-              child: Image.asset(
-                AppAssets.getEventImage(context, event.image),
-                height: 210.h,
-                width: double.infinity,
-                fit: BoxFit.cover,
+            // Event Image — rebuilds on theme switch via Consumer
+            Consumer<AppThemeProvider>(
+              builder: (context, themeProvider, _) => ClipRRect(
+                borderRadius: BorderRadius.circular(20.r),
+                child: Image.asset(
+                  themeProvider.isDark
+                      ? AppAssets.getDarkImage(event.image)
+                      : event.image,
+                  height: 210.h,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             SizedBox(height: 16.h),

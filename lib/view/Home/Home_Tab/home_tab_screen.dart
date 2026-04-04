@@ -1,14 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_planner_app/view/Home/Home_Tab/widgets/event_item.dart';
 import 'package:event_planner_app/view/Home/Profile_Tab/widgets/language_bottom_sheet.dart';
-import 'package:event_planner_app/view/Home/Profile_Tab/widgets/theme_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/widgets/user_avatar.dart';
 import '../../../view_model/providers/Language_Provider/app_language_provider.dart';
+import '../../../view_model/providers/Theme_Provider/app_theme_provider.dart';
 import '../../../view_model/providers/event_list_provider.dart';
 import '../../../view_model/providers/user_provider.dart';
 import 'widgets/event_category_tab_item.dart';
@@ -34,7 +35,6 @@ class _HomeTabScreenState extends State<HomeTab> {
   Widget build(BuildContext context) {
     var provider = Provider.of<EventListProvider>(context);
     var userProvider = Provider.of<UserProvider>(context);
-    final photoUrl = userProvider.currentUser?.photoUrl;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,13 +50,11 @@ class _HomeTabScreenState extends State<HomeTab> {
         title: Row(
           children: [
             // ── Profile avatar ──────────────────────────────────────────
-            CircleAvatar(
-              radius: 22.r,
-              backgroundColor: Colors.white,
-              backgroundImage: photoUrl != null
-                  ? NetworkImage(photoUrl)
-                  : const AssetImage('assets/images/profile.png')
-                        as ImageProvider,
+            Consumer<UserProvider>(
+              builder: (_, userProvider, __) => UserAvatar(
+                dataUrl: userProvider.currentUser?.photoUrl,
+                radius: 22.r,
+              ),
             ),
             SizedBox(width: 12.w),
 
@@ -74,21 +72,22 @@ class _HomeTabScreenState extends State<HomeTab> {
             ),
             const Spacer(),
 
-            // ── Theme toggle icon ───────────────────────────────────────
-            GestureDetector(
-              onTap: () => showModalBottomSheet(
-                context: context,
-                backgroundColor: Theme.of(context).cardColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20.r),
-                  ),
+            // ── Theme toggle — sun in light, moon in dark ───────────────
+            Consumer<AppThemeProvider>(
+              builder: (_, themeProvider, __) => GestureDetector(
+                onTap: () async {
+                  await themeProvider.changeTheme(
+                    themeProvider.isDark ? ThemeMode.light : ThemeMode.dark,
+                  );
+                },
+                child: Icon(
+                  themeProvider.isDark
+                      ? Icons
+                            .dark_mode_rounded // moon when dark
+                      : Icons.light_mode_rounded, // sun when light
+                  color: Colors.white,
+                  size: 28.sp,
                 ),
-                builder: (_) => const ThemeBottomSheet(),
-              ),
-              child: const ImageIcon(
-                AssetImage("assets/images/theme_icon.png"),
-                color: Colors.white,
               ),
             ),
 

@@ -3,6 +3,7 @@ import 'package:event_planner_app/view/Home/Home_Tab/Events/widgets/event_date_t
 import 'package:event_planner_app/view/Home/Home_Tab/Events/widgets/event_location_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/Firebase-Firestore/firebase_utils.dart';
 import '../../../../core/Firebase-Firestore/models/event.dart';
@@ -14,6 +15,7 @@ import '../../../../core/utils/toast_utils.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/custom_elavated button.dart';
 import '../../../../core/widgets/custom_text_form_field.dart';
+import '../../../../view_model/providers/Theme_Provider/app_theme_provider.dart';
 
 class UpdateEventScreen extends StatefulWidget {
   const UpdateEventScreen({super.key});
@@ -71,13 +73,17 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// 1. Event Image
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20.r),
-                  child: Image.asset(
-                    event.image,
-                    fit: BoxFit.cover,
-                    height: 210.h,
-                    width: double.infinity,
+                Consumer<AppThemeProvider>(
+                  builder: (context, themeProvider, _) => ClipRRect(
+                    borderRadius: BorderRadius.circular(20.r),
+                    child: Image.asset(
+                      themeProvider.isDark
+                          ? AppAssets.getDarkImage(event.image)
+                          : event.image,
+                      fit: BoxFit.cover,
+                      height: 210.h,
+                      width: double.infinity,
+                    ),
                   ),
                 ),
                 SizedBox(height: 16.h),

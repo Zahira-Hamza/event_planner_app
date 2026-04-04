@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -13,7 +13,7 @@ class UserProvider extends ChangeNotifier {
   bool isUploadingPhoto = false;
 
   Future<void> fetchCurrentUser() async {
-    String? uid = FirebaseAuthUtils.getCurrentUser()?.uid;
+    final uid = FirebaseAuthUtils.getCurrentUser()?.uid;
     if (uid != null) {
       currentUser = await FirebaseUtils.getUserFromFireStore(uid);
       notifyListeners();
@@ -24,8 +24,8 @@ class UserProvider extends ChangeNotifier {
     final picker = ImagePicker();
     final XFile? picked = await picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 70,
-      maxWidth: 512,
+      imageQuality: 60, // keep well under Firestore 1MB doc limit
+      maxWidth: 400, // ~400px is plenty for a profile avatar
     );
     if (picked == null) return;
 
@@ -36,16 +36,28 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('profile_photos')
-          .child('$uid.jpg');
+      // Read bytes → encode as base64 string
+      final bytes = await File(picked.path).readAsBytes();
+      final base64String = base64Encode(bytes);
 
-      await ref.putFile(File(picked.path));
-      final url = await ref.getDownloadURL();
+      // Prefix with mime type so we can decode it back to an image
+      final dataUrl = 'data:image/jpeg;base64,$base64String';
 
-      await FirebaseUtils.updateUserPhoto(uid, url);
-      currentUser = currentUser?.copyWith(photoUrl: url);
+      // Save to Firestore (no Storage needed)
+      await FirebaseUtils.updateUserPhoto(uid, dataUrl);
+
+      // Clear Flutter's image cache so the old avatar is evicted immediately
+      PaintingBinding.instance.imageCache.clear();
+      PaintingBinding.instance.imageCache.clearLiveImages();
+
+      // Replace the whole currentUser object — triggers Consumer rebuild
+      currentUser = UserModel(
+        id: currentUser!.id,
+        name: currentUser!.name,
+        email: currentUser!.email,
+        location: currentUser!.location,
+        photoUrl: dataUrl,
+      );
     } catch (e) {
       debugPrint('Photo upload error: $e');
     } finally {

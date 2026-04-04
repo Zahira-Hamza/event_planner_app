@@ -40,7 +40,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           icon: Icon(Icons.arrow_back, color: AppColors.bluePrimaryColor),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
         child: Form(
           key: formKey,
@@ -49,7 +49,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             children: [
               Image.asset(
                 "assets/images/forget_password_image.png",
-                height: 280.h,
+                height: 260.h,
                 fit: BoxFit.contain,
               ),
               SizedBox(height: 16.h),

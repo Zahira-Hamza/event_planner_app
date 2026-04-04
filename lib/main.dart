@@ -15,6 +15,7 @@ import 'package:event_planner_app/view_model/providers/user_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
@@ -23,22 +24,38 @@ import 'core/utils/app_theme.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  // Keep the splash visible while we initialise everything
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   await dotenv.load(fileName: ".env");
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await EasyLocalization.ensureInitialized();
 
-  // Network is enabled by default. Removed disableNetwork() to ensure data syncs to Firebase.
+  // Load persisted theme & language BEFORE providers are created,
+  // so the very first frame already has the correct values.
+  final themeProvider = AppThemeProvider();
+  final languageProvider = AppLanguageProvider();
+  await themeProvider.loadSavedTheme();
+  await languageProvider.loadSavedLanguage();
+
+  // Remove splash once init is done
+  FlutterNativeSplash.remove();
 
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
+      // Start with the saved locale so the app opens in the right language
+      startLocale: Locale(languageProvider.appLanguage),
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => AppLanguageProvider()),
-          ChangeNotifierProvider(create: (_) => AppThemeProvider()),
+          // Use the already-initialised instances so they have saved values
+          ChangeNotifierProvider<AppThemeProvider>.value(value: themeProvider),
+          ChangeNotifierProvider<AppLanguageProvider>.value(
+            value: languageProvider,
+          ),
           ChangeNotifierProvider(create: (_) => EventListProvider()),
           ChangeNotifierProvider(create: (_) => AppProvider()),
           ChangeNotifierProvider(create: (_) => UserProvider()),
@@ -54,7 +71,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var themeProvider = Provider.of<AppThemeProvider>(context);
+    final themeProvider = Provider.of<AppThemeProvider>(context);
     return ScreenUtilInit(
       designSize: const Size(393, 841),
       minTextAdapt: true,

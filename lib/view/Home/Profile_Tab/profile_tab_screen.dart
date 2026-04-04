@@ -9,6 +9,7 @@ import '../../../core/Firebase-Firestore/firebase_auth_utils.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/app_styles.dart';
+import '../../../core/widgets/user_avatar.dart';
 import '../../../view_model/providers/Language_Provider/app_language_provider.dart';
 import '../../../view_model/providers/Theme_Provider/app_theme_provider.dart';
 import '../../../view_model/providers/user_provider.dart';
@@ -129,18 +130,10 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: CircleAvatar(
+                      child: UserAvatar(
+                        dataUrl: photoUrl,
                         radius: 35.r,
-                        backgroundColor: Colors.white,
-                        backgroundImage: photoUrl != null
-                            ? NetworkImage(photoUrl)
-                            : const AssetImage('assets/images/profile.png')
-                                  as ImageProvider,
-                        child: isUploading
-                            ? const CircularProgressIndicator(
-                                color: AppColors.bluePrimaryColor,
-                              )
-                            : null,
+                        showUploadingSpinner: isUploading,
                       ),
                     ),
                     // Camera badge

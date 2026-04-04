@@ -37,8 +37,10 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
         width: 65.w,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 4.w),
+          // Match scaffold background so the ring around the FAB is invisible
+          color: Theme.of(context).scaffoldBackgroundColor,
         ),
+        padding: EdgeInsets.all(4.w),
         child: FloatingActionButton(
           onPressed: () {
             Navigator.pushNamed(context, AppRoutes.createEventRoute);
@@ -51,7 +53,7 @@ class _BottomNavBarWrapperState extends State<BottomNavBarWrapper> {
       ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
-        notchMargin: 6.r,
+        notchMargin: 8.r,
         height: 75.h,
         color: AppColors.bluePrimaryColor,
         child: SizedBox(
