@@ -243,15 +243,67 @@ Events/
 
 ## 📸 Screenshots
 
-> Add your screenshots here.
+### 🔐 Authentication
 
-| Sign In | Home | Event Details |
-|---|---|---|
-| ![](screenshots/sign_in.png) | ![](screenshots/home.png) | ![](screenshots/event_details.png) |
+| Sign In — Light | Sign In — Dark |
+|---|---|
+| ![](screenshots/sign_in_light.png) | ![](screenshots/sign_in_dark.png) |
 
-| Create Event | Map | Profile |
-|---|---|---|
-| ![](screenshots/create_event.png) | ![](screenshots/map.png) | ![](screenshots/profile.png) |
+| Sign Up — Light | Sign Up — Dark |
+|---|---|
+| ![](screenshots/sign_up_light.png) | ![](screenshots/sign_up_dark.png) |
+
+| Forget Password — Light | Forget Password — Dark |
+|---|---|
+| ![](screenshots/forget_password_light.png) | ![](screenshots/forget_password_dark.png) |
+
+---
+
+### 🏠 Home
+
+| Home — Light | Home — Dark |
+|---|---|
+| ![](screenshots/home_light.png) | ![](screenshots/home_dark.png) |
+
+---
+
+### 📋 Event Management
+
+| Create Event — Light | Create Event — Dark |
+|---|---|
+| ![](screenshots/create_event_light.png) | ![](screenshots/create_event_dark.png) |
+
+| Event Details — Light | Event Details — Dark |
+|---|---|
+| ![](screenshots/event_details_light.png) | ![](screenshots/event_details_dark.png) |
+
+| Update Event — Light | Update Event — Dark |
+|---|---|
+| ![](screenshots/update_event_light.png) | ![](screenshots/update_event_dark.png) |
+
+---
+
+### ❤️ Favourites
+
+| Favourites — Light | Favourites — Dark |
+|---|---|
+| ![](screenshots/favourites_light.png) | ![](screenshots/favourites_dark.png) |
+
+---
+
+### 🗺️ Map
+
+| Map — Light | Map — Dark |
+|---|---|
+| ![](screenshots/map_light.png) | ![](screenshots/map_dark.png) |
+
+---
+
+### 👤 Profile
+
+| Profile — Light | Profile — Dark |
+|---|---|
+| ![](screenshots/profile_light.png) | ![](screenshots/profile_dark.png) |
 
 ---
 
